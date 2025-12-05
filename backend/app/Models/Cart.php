@@ -16,6 +16,8 @@ class Cart extends Model
         'visit_date',
     ];
 
+    protected $appends = ['total_price'];
+
     // Relasi: Item keranjang ini milik siapa?
     public function user()
     {
@@ -26,5 +28,16 @@ class Cart extends Model
     public function destination()
     {
         return $this->belongsTo(Destination::class);
+    }
+
+    // --- LOGIKA HITUNG OTOMATIS (Accessor) ---
+    // Rumus: get[NamaAtribut]Attribute
+    public function getTotalPriceAttribute()
+    {
+        // Cek dulu apakah data destination tersedia (untuk menghindari error)
+        if ($this->relationLoaded('destination') || $this->destination) {
+            return $this->quantity * $this->destination->price;
+        }
+        return 0;
     }
 }

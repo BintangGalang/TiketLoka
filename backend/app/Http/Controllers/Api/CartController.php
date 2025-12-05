@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Http\Resources\CartResource;
 use App\Models\Destination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,10 +14,15 @@ class CartController extends Controller
     // Lihat isi keranjang
     public function index(Request $request)
     {
-        // Ambil cart milik user yang sedang login + data destinasinya
-        $carts = Cart::with('destination')->where('user_id', $request->user()->id)->get();
+        $userId = $request->user()->id;
 
-        return response()->json(['data' => $carts]);
+        $carts = Cart::with('destination')
+            ->where('user_id', $userId)
+            ->get();
+
+        // Bungkus hasil query dengan Resource Collection
+        // Ini akan otomatis mengubah struktur JSON sesuai file CartResource tadi
+        return CartResource::collection($carts);
     }
 
     // Tambah ke keranjang
