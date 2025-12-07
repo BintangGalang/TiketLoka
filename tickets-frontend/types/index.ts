@@ -1,11 +1,21 @@
-// src/types/index.ts
+// Tambahkan interface Category jika belum ada
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
 
 export interface Destination {
   id: number;
   name: string;
+  slug: string; // <--- WAJIB DITAMBAHKAN
   location: string;
-  image_url: string;
+  image_url: string | null;
   price: number;
+  description?: string;
+  category_id?: number;
+  category?: Category; // Opsional, karena kadang data API mengembalikan relasi kategori
+  is_active?: boolean | number;
 }
 
 export interface BookingDetail {
@@ -23,7 +33,7 @@ export interface Booking {
   status: 'pending' | 'success' | 'failed';
   payment_method: string;
   paid_at: string;
-  qr_string: string; // Ini dari $appends di Model Laravel
+  qr_string: string;
   created_at: string;
   details: BookingDetail[];
 }
@@ -34,6 +44,6 @@ export interface CartItem {
   destination_id: number;
   quantity: number;
   visit_date: string;
-  total_price: number; // Ini dari $appends di Model Cart
-  destination: Destination; // Relasi ke wisata
+  total_price: number;
+  destination: Destination;
 }

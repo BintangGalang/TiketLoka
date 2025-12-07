@@ -1,26 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
-
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-export interface Destination {
-  id: number;
-  name: string;
-  slug: string;
-  location: string;
-  price: number;
-  image_url: string | null;
-  category?: Category;
-}
+import { Destination } from '@/types'; // Gunakan type dari file types
 
 export default function EventCard({ data }: { data: Destination }) {
-  // Fallback Image
+  // Fallback jika gambar kosong
   const fallbackImage = 'https://images.unsplash.com/photo-1596423348633-8472df3b006c?auto=format&fit=crop&w=800';
+  
+  // Logic: Gunakan image_url dari database, jika null pakai fallback
   const imageSrc = data.image_url ? data.image_url : fallbackImage;
 
   return (
@@ -33,11 +20,14 @@ export default function EventCard({ data }: { data: Destination }) {
           className="object-cover group-hover:scale-110 transition-transform duration-700"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           priority={false}
+          // unoptimized={true} membantu menghindari masalah domain local saat development
           unoptimized={true} 
         />
-        {data.category && (
+        {/* Badge Kategori (Opsional, pastikan data category ada di API) */}
+        {/* Jika API index belum join kategori, bagian ini bisa error jika tidak dicek */}
+        {(data as any).category && (
           <div className="absolute top-3 left-3 bg-[#F57C00]/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm">
-            {data.category.name}
+            {(data as any).category.name}
           </div>
         )}
       </div>
