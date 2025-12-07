@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
-    // --- USER AREA ---
-
-    // Proses Checkout (Dari Keranjang -> Jadi Transaksi)
+    // Beli dari keranjang
     public function checkout(Request $request)
     {
         $request->validate([
@@ -48,12 +46,11 @@ class BookingController extends Controller
             }
 
             do {
-                // Generate: TL + 6 karakter random uppercase (Tanpa Strip)
-                // Contoh Hasil: TLX7K92M
+                // Generate kode booking
                 $bookingCode = 'TL' . Str::upper(Str::random(6));
             } while (Booking::where('booking_code', $bookingCode)->exists());
 
-            // Buat Transaksi (Langsung Success)
+            // Buat Transaksi
             $booking = Booking::create([
                 'user_id' => $userId,
                 'booking_code' => $bookingCode,
@@ -63,7 +60,6 @@ class BookingController extends Controller
                 'payment_method' => $request->payment_method,
             ]);
 
-            // Pindahkan item ke BookingDetail
             // Kumpulkan ID cart yang berhasil diproses untuk dihapus nanti
             $processedCartIds = [];
 
@@ -80,8 +76,7 @@ class BookingController extends Controller
                 $processedCartIds[] = $cart->id;
             }
 
-            // Hapus HANYA item yang dipilih dari keranjang
-            // Item yang tidak dipilih akan tetap aman di keranjang
+            // Hapus item yang dipilih dari keranjang
             Cart::whereIn('id', $processedCartIds)->delete();
 
             return response()->json([
@@ -92,10 +87,9 @@ class BookingController extends Controller
         });
     }
 
-    // --- FITUR BELI LANGSUNG (Direct Buy) ---
+    // Beli langsung (tanpa keranjang)
     public function buyNow(Request $request)
     {
-        // ... (Validasi tetap sama) ...
         $userId = $request->user()->id;
         $destination = Destination::findOrFail($request->destination_id);
 
@@ -103,12 +97,10 @@ class BookingController extends Controller
 
             $totalAmount = $destination->price * $request->quantity;
             do {
-                // Generate: TL + 6 karakter random uppercase (Tanpa Strip)
-                // Contoh Hasil: TLX7K92M
+                // Generate kode booking
                 $bookingCode = 'TL' . Str::upper(Str::random(6));
             } while (Booking::where('booking_code', $bookingCode)->exists());
 
-            // [PERUBAHAN DISINI]
             $booking = Booking::create([
                 'user_id' => $userId,
                 'booking_code' => $bookingCode,
@@ -118,7 +110,7 @@ class BookingController extends Controller
                 'payment_method' => $request->payment_method,
             ]);
 
-            // ... (Buat BookingDetail tetap sama) ...
+            // Booking detail
             BookingDetail::create([
                 'booking_id' => $booking->id,
                 'destination_id' => $destination->id,
@@ -162,19 +154,16 @@ class BookingController extends Controller
         return response()->json(['data' => $booking]);
     }
 
-    // --- ADMIN AREA ---
-
     // Lihat Semua Transaksi (Bisa Filter Status)
     public function adminIndex(Request $request)
     {
         $query = Booking::with('user');
 
-        // Filter status (pending/success)
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter tanggal (Sesuai Flowchart Admin)
+        // Filter tanggal
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
