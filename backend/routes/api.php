@@ -17,6 +17,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Wisata & Kategori
+Route::get('/destinations/popular', [DestinationController::class, 'popular']);
 Route::get('/destinations', [DestinationController::class, 'index']);
 Route::get('/destinations/{slug}', [DestinationController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']); // <--- Untuk Menu Filter Frontend

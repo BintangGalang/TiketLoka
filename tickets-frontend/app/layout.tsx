@@ -1,26 +1,23 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext"; // <--- Import ini
+// src/app/layout.tsx
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { AuthProvider } from '@/context/AuthContext';
+import { Toaster } from 'react-hot-toast'; // <-- IMPORT BARU
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "TiketLoka",
-  description: "Booking Wisata Mudah",
-};
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="id">
       <body className={inter.className}>
-        {/* Bungkus Children dengan AuthProvider */}
+        {/* TOAST PROVIDER DITEMPATKAN DI AKHIR BODY */}
+        <Toaster position="top-right" reverseOrder={false} /> 
         <AuthProvider>
-           {children}
+          {children}
         </AuthProvider>
       </body>
     </html>

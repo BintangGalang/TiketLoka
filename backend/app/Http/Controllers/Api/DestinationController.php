@@ -60,6 +60,38 @@ class DestinationController extends Controller
     }
 
     /**
+     * PUBLIC: Menampilkan destinasi berdasarkan jumlah tiket terjual terbanyak
+     */
+    public function popular(Request $request)
+    {
+        // Mengambil jumlah data yang diminta (default 10)
+        $limit = $request->get('limit', 10); 
+
+        $destinations = Destination::with('category')
+            // Join dengan booking_details untuk menghitung total terjual
+            ->leftJoin('booking_details', 'destinations.id', '=', 'booking_details.destination_id')
+            // Menghitung SUM(quantity) sebagai total_sold
+            ->selectRaw('destinations.*, SUM(booking_details.quantity) as total_sold')
+            ->where('destinations.is_active', true)
+            // Grouping berdasarkan destinations.id agar SUM() berfungsi
+            ->groupBy('destinations.id') 
+            // Mengurutkan dari yang paling banyak terjual
+            ->orderBy('total_sold', 'desc')
+            // Fallback sort berdasarkan ID terbaru
+            ->orderBy('destinations.id', 'desc') 
+            ->take($limit)
+            ->get();
+
+        // Transform data agar URL gambar benar
+        $data = $destinations->map(function ($item) {
+            $item->image_url = $this->formatImageUrl($item->image_url);
+            return $item;
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
+    /**
      * PUBLIC: Detail Wisata Single Page
      */
     public function show($slug)
