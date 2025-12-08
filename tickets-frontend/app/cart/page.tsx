@@ -207,20 +207,26 @@ export default function CartPage() {
                 <p className="text-xs font-bold text-gray-400 uppercase mb-2 tracking-wider">Metode Bayar</p>
                 <div className="space-y-2">
                     {[
-                        {val: 'qris', label: 'QRIS (Instant)'}, 
-                        {val: 'transfer', label: 'Bank Transfer'}, 
-                        {val: 'cod', label: 'Bayar di Lokasi'}
+                        { val: 'qris', label: 'QRIS (Instant)' },
+                        { val: 'bca', label: 'Transfer Bank BCA' }
                     ].map(method => (
-                        <label key={method.val} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer text-sm transition-all ${paymentMethod === method.val ? 'border-[#F57C00] bg-orange-50 ring-1 ring-[#F57C00]/30' : 'border-gray-100 hover:bg-gray-50'}`}>
-                            <input 
-                                type="radio" 
-                                name="pay" 
-                                value={method.val} 
-                                checked={paymentMethod === method.val} 
-                                onChange={e => setPaymentMethod(e.target.value)} 
-                                className="accent-[#F57C00] w-4 h-4"
-                            />
-                            <span className="font-medium text-gray-700">{method.label}</span>
+                        <label 
+                          key={method.val} 
+                          className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer text-sm transition-all 
+                            ${paymentMethod === method.val 
+                              ? 'border-[#F57C00] bg-orange-50 ring-1 ring-[#F57C00]/30' 
+                              : 'border-gray-100 hover:bg-gray-50'
+                            }`}
+                        >
+                          <input
+                            type="radio"
+                            name="pay"
+                            value={method.val}
+                            checked={paymentMethod === method.val}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="accent-[#F57C00] w-4 h-4"
+                          />
+                          <span className="font-medium text-gray-700">{method.label}</span>
                         </label>
                     ))}
                 </div>
