@@ -54,7 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- ADMIN ONLY ROUTES ---
     Route::prefix('admin')->group(function () {
-
+        
+        Route::post('/admin/tickets/scan', [\App\Http\Controllers\Api\TicketScannerController::class, 'scan']);
         // Dashboard Stats
         Route::get('/dashboard', [DashboardController::class, 'stats']); // <--- Route Dashboard
 

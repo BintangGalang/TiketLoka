@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
-    // Beli dari keranjang
+    // Beli dari keranjang (Checkout)
     public function checkout(Request $request)
     {
         $request->validate([
@@ -45,25 +45,30 @@ class BookingController extends Controller
                 $total += $cart->destination->price * $cart->quantity;
             }
 
+            // Generate Kode Booking Utama (Satu untuk semua item)
             do {
-                // Generate kode booking
                 $bookingCode = 'TL' . Str::upper(Str::random(6));
             } while (Booking::where('booking_code', $bookingCode)->exists());
 
-            // Buat Transaksi
+            // Buat Transaksi Induk
             $booking = Booking::create([
                 'user_id' => $userId,
                 'booking_code' => $bookingCode,
                 'grand_total' => $total,
-                'status' => 'success',
+                'status' => 'success', // Simulasi langsung sukses
                 'paid_at' => now(),
                 'payment_method' => $request->payment_method,
+                'qr_string' => $bookingCode, // QR String untuk booking utama
             ]);
 
             // Kumpulkan ID cart yang berhasil diproses untuk dihapus nanti
             $processedCartIds = [];
 
             foreach ($carts as $cart) {
+                // Generate Kode Tiket Unik Per Item
+                // Format: TKT-{DestinationID}-{RandomString}
+                $uniqueTicketCode = 'TKT-' . $cart->destination_id . '-' . Str::upper(Str::random(6));
+
                 BookingDetail::create([
                     'booking_id' => $booking->id,
                     'destination_id' => $cart->destination_id,
@@ -71,6 +76,7 @@ class BookingController extends Controller
                     'price_per_unit' => $cart->destination->price,
                     'subtotal' => $cart->destination->price * $cart->quantity,
                     'visit_date' => $cart->visit_date,
+                    'ticket_code' => $uniqueTicketCode, // <--- PENTING: Kode Unik Disimpan Disini
                 ]);
 
                 $processedCartIds[] = $cart->id;
@@ -87,7 +93,7 @@ class BookingController extends Controller
         });
     }
 
-    // Beli langsung (tanpa keranjang)
+    // Beli langsung (Buy Now - Tanpa Keranjang)
     public function buyNow(Request $request)
     {
         $userId = $request->user()->id;
@@ -96,11 +102,12 @@ class BookingController extends Controller
         return DB::transaction(function () use ($request, $userId, $destination) {
 
             $totalAmount = $destination->price * $request->quantity;
+            
             do {
-                // Generate kode booking
                 $bookingCode = 'TL' . Str::upper(Str::random(6));
             } while (Booking::where('booking_code', $bookingCode)->exists());
 
+            // Buat Booking Induk
             $booking = Booking::create([
                 'user_id' => $userId,
                 'booking_code' => $bookingCode,
@@ -108,7 +115,11 @@ class BookingController extends Controller
                 'status' => 'success',
                 'paid_at' => now(),
                 'payment_method' => $request->payment_method,
+                'qr_string' => $bookingCode,
             ]);
+
+            // Generate Kode Tiket Unik
+            $uniqueTicketCode = 'TKT-' . $destination->id . '-' . Str::upper(Str::random(6));
 
             // Booking detail
             BookingDetail::create([
@@ -118,6 +129,7 @@ class BookingController extends Controller
                 'price_per_unit' => $destination->price,
                 'subtotal' => $totalAmount,
                 'visit_date' => $request->visit_date,
+                'ticket_code' => $uniqueTicketCode, // <--- PENTING
             ]);
 
             return response()->json([
@@ -154,7 +166,7 @@ class BookingController extends Controller
         return response()->json(['data' => $booking]);
     }
 
-    // Lihat Semua Transaksi (Bisa Filter Status)
+    // Lihat Semua Transaksi (Admin)
     public function adminIndex(Request $request)
     {
         $query = Booking::with('user');

@@ -102,8 +102,8 @@ export default function BookingModal({ isOpen, onClose, destination, selectedDat
           <div className="space-y-2">
             {[
               { id: 'qris', label: 'QRIS (Instant)', icon: <Wallet className="w-4 h-4"/> },
-              { id: 'transfer', label: 'Bank Transfer', icon: <CreditCard className="w-4 h-4"/> },
-              { id: 'cod', label: 'Bayar di Lokasi', icon: <Banknote className="w-4 h-4"/> },
+              { id: 'transfer', label: 'Transfer Bank BCA', icon: <CreditCard className="w-4 h-4"/> },
+              
             ].map((method) => (
               <label key={method.id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${paymentMethod === method.id ? 'border-[#F57C00] bg-orange-50 ring-1 ring-[#F57C00]' : 'border-gray-200 hover:border-blue-200'}`}>
                 <input 

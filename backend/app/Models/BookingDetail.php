@@ -16,6 +16,7 @@ class BookingDetail extends Model
         'price_per_unit', // Harga saat beli (Snapshot)
         'subtotal',
         'visit_date',
+        'ticket_code',
     ];
 
     // Relasi: Detail ini milik transaksi nomor berapa?

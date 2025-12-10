@@ -1,3 +1,4 @@
+// src/app/events/[slug]/page.tsx (FILE MODIFIKASI)
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -8,7 +9,16 @@ import { ArrowLeft, Loader2, MapPin, DollarSign, Clock, CheckCircle } from 'luci
 import Navbar from '@/components/layout/Navbar';
 import BookingForm from '@/components/booking/BookingForm'; 
 import { Destination } from '@/types';
-import toast from 'react-hot-toast'; // <-- IMPORT TOAST
+import toast from 'react-hot-toast';
+
+// --- Helper URL Gambar (Tetap di sini untuk digunakan di Client Component) ---
+const getImageUrl = (url: string | null) => {
+    if (!url) return 'https://images.unsplash.com/photo-1517400508535-b2a1a062776c?q=80&w=2070';
+    if (url.startsWith('http')) return url;
+    return `http://127.0.0.1:8000/storage/${url}`;
+};
+// ---------------------------------------------------
+
 
 export default function EventDetailPage() {
     const params = useParams();
@@ -16,13 +26,6 @@ export default function EventDetailPage() {
     
     const [destination, setDestination] = useState<Destination | null>(null);
     const [loading, setLoading] = useState(true);
-
-    // Helper URL Gambar (Dipastikan sama)
-    const getImageUrl = (url: string | null) => {
-        if (!url) return 'https://images.unsplash.com/photo-1517400508535-b2a1a062776c?q=80&w=2070';
-        if (url.startsWith('http')) return url;
-        return `http://127.0.0.1:8000/storage/${url}`;
-    };
 
     useEffect(() => {
         async function fetchDetail() {

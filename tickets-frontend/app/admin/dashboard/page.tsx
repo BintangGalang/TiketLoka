@@ -3,13 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-// --- PERBAIKAN DI SINI (Menambahkan Calendar) ---
 import { 
   DollarSign, Ticket, Users, ShoppingBag, 
   Clock, ArrowRight, LogOut, ChevronDown, 
-  Map, Plus, ShoppingCart, Calendar 
+  Map, Calendar, QrCode 
 } from 'lucide-react';
-// ------------------------------------------------
 
 // --- TIPE DATA ---
 interface DashboardData {
@@ -76,8 +74,17 @@ export default function AdminDashboard() {
             </p>
         </div>
         
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center flex-wrap">
             
+            {/* TOMBOL SCAN TIKET (Baru) */}
+            <Link 
+                href="/admin/scan" 
+                className="flex px-5 py-3 bg-[#F57C00] text-white font-bold rounded-xl hover:bg-[#E65100] transition items-center gap-2 shadow-lg shadow-orange-200 text-sm"
+            >
+                <QrCode size={18} /> 
+                <span>Scan Tiket</span>
+            </Link>
+
             {/* Tombol Kelola Wisata */}
             <Link 
                 href="/admin/destinations" 
@@ -178,7 +185,7 @@ export default function AdminDashboard() {
                         <th className="px-6 py-4">Tanggal Order</th>
                         <th className="px-6 py-4">Total Pembayaran</th>
                         <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Aksi</th>
+                        {/* Kolom Aksi DIHAPUS sesuai request */}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -217,19 +224,11 @@ export default function AdminDashboard() {
                                 <td className="px-6 py-4">
                                     <StatusBadge status={b.status} />
                                 </td>
-                                <td className="px-6 py-4 text-right">
-                                    <Link 
-                                        href={`/admin/bookings`} 
-                                        className="text-xs font-bold text-blue-700 hover:text-blue-900 hover:underline"
-                                    >
-                                        Detail
-                                    </Link>
-                                </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={6} className="text-center py-12">
+                            <td colSpan={5} className="text-center py-12">
                                 <div className="flex flex-col items-center justify-center text-gray-400">
                                     <ShoppingBag size={48} className="opacity-20 mb-3" />
                                     <p className="font-medium">Belum ada transaksi masuk hari ini.</p>

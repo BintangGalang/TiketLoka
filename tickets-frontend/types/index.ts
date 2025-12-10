@@ -24,6 +24,7 @@ export interface BookingDetail {
   quantity: number;
   visit_date: string;
   subtotal: number;
+  ticket_code: string; // <--- TAMBAHKAN INI
 }
 
 export interface Booking {
