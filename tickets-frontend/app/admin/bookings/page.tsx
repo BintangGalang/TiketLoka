@@ -54,12 +54,13 @@ export default function AdminBookings() {
       
       if (json.data) {
         setBookings(json.data);
+        // Pastikan meta data aman, beri fallback jika undefined
         setMeta({
-            current_page: json.current_page,
-            last_page: json.last_page,
-            total: json.total,
-            from: json.from,
-            to: json.to
+            current_page: json.current_page || 1,
+            last_page: json.last_page || 1,
+            total: json.total || 0,
+            from: json.from || 0,
+            to: json.to || 0
         });
       }
     } catch (err) {
@@ -147,7 +148,6 @@ export default function AdminBookings() {
                                 <th className="px-6 py-3">Destinasi</th>
                                 <th className="px-6 py-3">User</th>
                                 <th className="px-6 py-3">Tanggal</th>
-                                {/* KOLOM BARU: KAPASITAS */}
                                 <th className="px-6 py-3 text-center">Kapasitas</th> 
                                 <th className="px-6 py-3">Total</th>
                                 <th className="px-6 py-3">Status</th>
@@ -156,13 +156,23 @@ export default function AdminBookings() {
                         <tbody className="divide-y divide-gray-100">
                             {bookings.length > 0 ? (
                                 bookings.map((item, index) => {
-                                    const rowNumber = meta ? (meta.current_page - 1) * 10 + (index + 1) : index + 1;
+                                    // --- PERBAIKAN LOGIKA NOMOR URUT ---
+                                    // Ambil halaman saat ini, jika tidak ada default ke 1
+                                    const currentPage = meta?.current_page || 1;
+                                    
+                                    // Hitung nomor urut: (Halaman - 1) * 10 + Index + 1
+                                    const rowNumber = (currentPage - 1) * 10 + (index + 1);
+                                    // ------------------------------------
+
                                     const destName = item.details?.[0]?.destination?.name || 'Unknown';
                                     const pax = item.details?.reduce((acc, curr) => acc + curr.quantity, 0) || 0;
 
                                     return (
                                         <tr key={item.id} className="hover:bg-blue-50/50 transition">
-                                            <td className="px-6 py-4 text-center font-bold text-gray-400">{rowNumber}</td>
+                                            <td className="px-6 py-4 text-center font-bold text-gray-400">
+                                                {/* Cegah NaN tampil di UI */}
+                                                {isNaN(rowNumber) ? index + 1 : rowNumber}
+                                            </td>
                                             <td className="px-6 py-4 font-mono font-medium text-[#0B2F5E]">{item.booking_code}</td>
                                             <td className="px-6 py-4">
                                                 <span className="font-bold text-gray-800">{destName}</span>
@@ -175,7 +185,6 @@ export default function AdminBookings() {
                                                 {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                                             </td>
                                             
-                                            {/* DATA KAPASITAS DIPINDAHKAN KESINI */}
                                             <td className="px-6 py-4 text-center">
                                                 <span className="text-blue-700 px-3 py-1 rounded-full text-xs font-bold">
                                                     {pax} Orang
@@ -211,7 +220,7 @@ export default function AdminBookings() {
             {meta && meta.last_page > 1 && (
                 <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
                     <p className="text-xs text-gray-500">
-                        Menampilkan <span className="font-bold">{meta.from}-{meta.to}</span> dari {meta.total} data
+                        Menampilkan <span className="font-bold">{meta.from || 0}-{meta.to || 0}</span> dari {meta.total || 0} data
                     </p>
                     <div className="flex gap-2">
                         <button 

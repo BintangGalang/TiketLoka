@@ -18,7 +18,7 @@ export default function Navbar() {
             {/* Ukuran container diperbesar: h-14 (56px) dan w-52 (208px) */}
             <div className="relative h-14 w-52 transition-transform hover:scale-105">
                 <Image
-                    src="/images/logo-navbar.png" // Pastikan file ini ada
+                    src="/images/navbar.png" // Pastikan file ini ada
                     alt="TiketLoka Logo"
                     fill
                     className="object-contain object-left" // object-left agar rata kiri
