@@ -14,7 +14,8 @@ class Review extends Model
         'destination_id',
         'booking_id',
         'rating',
-        'comment'
+        'comment',       // <--- PASTIKAN ADA KOMA DI SINI
+        'image'          // Baru ditambahkan
     ];
 
     public function user()
